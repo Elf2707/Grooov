@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="jgoodies-forms-1.8.0.jar" sourcepath="jgoodies-forms-1.8.0-sources.jar"/>
+	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
+	<classpathentry kind="lib" path="C:/Users/Elf/workspace/Grooov/jlgui3.0/lib/commons-logging-api.jar"/>
+	<classpathentry kind="lib" path="C:/JDK831/lib/tools.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/Elf/.m2/repository/com/mpatric/mp3agic/0.8.3/mp3agic-0.8.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Elf/workspace/Grooov/jlgui3.0/lib/basicplayer3.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Elf/workspace/Grooov/jlgui3.0/lib/mp3spi1.9.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Elf/workspace/Grooov/jlgui3.0/lib/jl1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Elf/workspace/Grooov/jlgui3.0/lib/tritonus_share.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
