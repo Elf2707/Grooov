@@ -1,6 +1,9 @@
 package grovpackage;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -17,10 +20,8 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
@@ -29,20 +30,17 @@ import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.JScrollPane;
-
-import com.sun.org.apache.bcel.internal.generic.LSTORE;
-
-import dynamiclabelimpl.LabelTextMover;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.BevelBorder;
 
 class wndMainGroov extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private int lastVolumePosition = GroooovPlayer.SATRT_VOLUME;
-	private static int TIMER_DELAY = 1000; //milliseconds
 	private GroooovPlayer soundPlayer = null;
     Timer playTimer = null;
-    MoveTextLable lblSongName;
+    MoveTextLabel lblSongName;
     
 	
 
@@ -73,13 +71,17 @@ class wndMainGroov extends JFrame {
 		//Player object
 		soundPlayer = new GroooovPlayer(lstListOfSongs);
 		JPanel pnlList = new JPanel();
+		pnlList.setAlignmentY(0.0f);
+		pnlList.setAlignmentX(0.0f);
+		pnlList.setSize(new Dimension(450, 300));
+		pnlList.setPreferredSize(new Dimension(200, 200));
 		
 		getContentPane().add(pnlList);
 		GridBagLayout gbl_pnlList = new GridBagLayout();
 		gbl_pnlList.columnWidths = new int[] {30, 30, 30, 30, 30, 30, 0};
-		gbl_pnlList.rowHeights = new int[] {0, 12, 112, 0, 10};
+		gbl_pnlList.rowHeights = new int[] {0, 0, 125, 12, 10};
 		gbl_pnlList.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0};
-		gbl_pnlList.rowWeights = new double[]{0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
+		gbl_pnlList.rowWeights = new double[]{0.0, 1.0, 1.0, 1.0, Double.MIN_VALUE};
 		pnlList.setLayout(gbl_pnlList);
 		
 		//Panel with play, pause, stop etc buttons
@@ -87,9 +89,9 @@ class wndMainGroov extends JFrame {
 		getContentPane().add(pnlPlay, BorderLayout.NORTH);
 		GridBagLayout gbl_pnlPlay = new GridBagLayout();
 		gbl_pnlPlay.columnWidths = new int[]{49, 49, 49, 49, 49, 49, 49, 49, 0};
-		gbl_pnlPlay.rowHeights = new int[]{25, 0};
-		gbl_pnlPlay.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_pnlPlay.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+		gbl_pnlPlay.rowHeights = new int[]{25, 0, 0};
+		gbl_pnlPlay.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_pnlPlay.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		pnlPlay.setLayout(gbl_pnlPlay);
 		
 		//hot keys combinations
@@ -136,7 +138,7 @@ class wndMainGroov extends JFrame {
 		btnPlay.setText("");
 		GridBagConstraints gbc_btnPlay = new GridBagConstraints();
 		gbc_btnPlay.anchor = GridBagConstraints.NORTHWEST;
-		gbc_btnPlay.insets = new Insets(0, 0, 0, 5);
+		gbc_btnPlay.insets = new Insets(0, 0, 5, 5);
 		gbc_btnPlay.gridx = 0;
 		gbc_btnPlay.gridy = 0;
 		btnPlay.setHorizontalAlignment(SwingConstants.LEFT);
@@ -146,16 +148,16 @@ class wndMainGroov extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				lblSongName.setText("Dasdasmdkmasl askmdakmdka");
+				lblSongName.initText(lstListOfSongs.getSelectedValue().getFilename());
 				lblSongName.start();
 			}
 		});
-				
+			
 		JButton btnPause = new JButton(pauseAction);
 		btnPause.setText("");
 		GridBagConstraints gbc_btnPause = new GridBagConstraints();
 		gbc_btnPause.anchor = GridBagConstraints.NORTHWEST;
-		gbc_btnPause.insets = new Insets(0, 0, 0, 5);
+		gbc_btnPause.insets = new Insets(0, 0, 5, 5);
 		gbc_btnPause.gridx = 1;
 		gbc_btnPause.gridy = 0;
 		pnlPlay.add(btnPause, gbc_btnPause);
@@ -164,7 +166,7 @@ class wndMainGroov extends JFrame {
 		btnStop.setText("");
 		GridBagConstraints gbc_btnStop = new GridBagConstraints();
 		gbc_btnStop.anchor = GridBagConstraints.NORTHWEST;
-		gbc_btnStop.insets = new Insets(0, 0, 0, 5);
+		gbc_btnStop.insets = new Insets(0, 0, 5, 5);
 		gbc_btnStop.gridx = 2;
 		gbc_btnStop.gridy = 0;
 		pnlPlay.add(btnStop, gbc_btnStop);
@@ -173,7 +175,7 @@ class wndMainGroov extends JFrame {
 		btnRewined.setText("");
 		GridBagConstraints gbc_btnRewined = new GridBagConstraints();
 		gbc_btnRewined.anchor = GridBagConstraints.NORTHWEST;
-		gbc_btnRewined.insets = new Insets(0, 0, 0, 5);
+		gbc_btnRewined.insets = new Insets(0, 0, 5, 5);
 		gbc_btnRewined.gridx = 3;
 		gbc_btnRewined.gridy = 0;
 		pnlPlay.add(btnRewined, gbc_btnRewined);
@@ -182,7 +184,7 @@ class wndMainGroov extends JFrame {
 		btnForward.setText("");
 		GridBagConstraints gbc_btnForward = new GridBagConstraints();
 		gbc_btnForward.anchor = GridBagConstraints.NORTHWEST;
-		gbc_btnForward.insets = new Insets(0, 0, 0, 5);
+		gbc_btnForward.insets = new Insets(0, 0, 5, 5);
 		gbc_btnForward.gridx = 4;
 		gbc_btnForward.gridy = 0;
 		pnlPlay.add(btnForward, gbc_btnForward);
@@ -191,7 +193,7 @@ class wndMainGroov extends JFrame {
 		btnPrevious.setText("");
 		GridBagConstraints gbc_btnPrevious = new GridBagConstraints();
 		gbc_btnPrevious.anchor = GridBagConstraints.NORTHWEST;
-		gbc_btnPrevious.insets = new Insets(0, 0, 0, 5);
+		gbc_btnPrevious.insets = new Insets(0, 0, 5, 5);
 		gbc_btnPrevious.gridx = 5;
 		gbc_btnPrevious.gridy = 0;
 		pnlPlay.add(btnPrevious, gbc_btnPrevious);
@@ -200,7 +202,7 @@ class wndMainGroov extends JFrame {
 		btnNext.setText("");
 		GridBagConstraints gbc_btnNext = new GridBagConstraints();
 		gbc_btnNext.anchor = GridBagConstraints.NORTHWEST;
-		gbc_btnNext.insets = new Insets(0, 0, 0, 5);
+		gbc_btnNext.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNext.gridx = 6;
 		gbc_btnNext.gridy = 0;
 		pnlPlay.add(btnNext, gbc_btnNext);
@@ -236,6 +238,7 @@ class wndMainGroov extends JFrame {
 		tgbtnMute.setSelectedIcon(new ImageIcon("C:\\Users\\Elf\\workspace\\Grooov\\res\\images\\mute.png"));
 		tgbtnMute.setIcon(new ImageIcon("C:\\Users\\Elf\\workspace\\Grooov\\res\\images\\speaker.png"));
 		GridBagConstraints gbc_tgbtnMute = new GridBagConstraints();
+		gbc_tgbtnMute.insets = new Insets(0, 0, 5, 0);
 		gbc_tgbtnMute.gridx = 7;
 		gbc_tgbtnMute.gridy = 0;
 		pnlPlay.add(tgbtnMute, gbc_tgbtnMute);
@@ -271,16 +274,7 @@ class wndMainGroov extends JFrame {
 		gbc_lblSongTime.gridy = 0;
 		pnlList.add(lblSongTime, gbc_lblSongTime);
 		
-		lblSongName = new MoveTextLable("Song Name", 1000, null);
-		GridBagConstraints gbc_lblSongName = new GridBagConstraints();
-		gbc_lblSongName.fill = GridBagConstraints.HORIZONTAL;
-		gbc_lblSongName.anchor = GridBagConstraints.WEST;
-		gbc_lblSongName.gridwidth = 7;
-		gbc_lblSongName.insets = new Insets(0, 0, 5, 5);
-		gbc_lblSongName.gridx = 0;
-		gbc_lblSongName.gridy = 1;
-		pnlList.add(lblSongName, gbc_lblSongName);
-		lblSongName.setChanger(new LabelTextMover());
+		
 		
 		
 		JScrollPane scrlListScroll = new JScrollPane();
@@ -298,7 +292,6 @@ class wndMainGroov extends JFrame {
 		btnSaveList.setIcon(new ImageIcon("C:\\Users\\Elf\\workspace\\Grooov\\res\\images\\save_16.png"));
 		GridBagConstraints gbc_btnSaveList = new GridBagConstraints();
 		gbc_btnSaveList.insets = new Insets(0, 0, 0, 5);
-		gbc_btnSaveList.anchor = GridBagConstraints.WEST;
 		gbc_btnSaveList.gridx = 0;
 		gbc_btnSaveList.gridy = 3;
 		pnlList.add(btnSaveList, gbc_btnSaveList);
@@ -404,22 +397,23 @@ class wndMainGroov extends JFrame {
 		btnDownSongInList.addActionListener(EventHandler.create(ActionListener.class, lstListOfSongs, "downSong"));
 		btnUpSongInList.addActionListener(EventHandler.create(ActionListener.class, lstListOfSongs, "upSong"));
 		
-		JMenuBar menuBar = new JMenuBar();
-		getContentPane().add(menuBar, BorderLayout.SOUTH);
+		JPanel pnlSongName = new JPanel();
+		pnlSongName.setBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(0, 255, 0), new Color(0, 255, 127)));
+		getContentPane().add(pnlSongName, BorderLayout.SOUTH);
 		
-		JMenu mnMenu = new JMenu("Menu");
-		mnMenu.setHorizontalAlignment(SwingConstants.LEFT);
-		menuBar.add(mnMenu);
-		
-		JMenuItem mntmSettings = new JMenuItem("Settings");
-		mnMenu.add(mntmSettings);
-		
-		JMenuItem mntmChangeSkin = new JMenuItem("Change skin");
-		mnMenu.add(mntmChangeSkin);
+		lblSongName = new MoveTextLabel("Welcome to the Grooooooooov!!!");
+		lblSongName.setMinimumSize(new Dimension(188, 20));
+		lblSongName.setMaximumSize(new Dimension(188, 20));
+		lblSongName.setBounds(new Rectangle(0, 0, 450, 20));
+		pnlSongName.add(lblSongName);
+		lblSongName.setPreferredSize(new Dimension(400, 20));
+		lblSongName.setForeground(new Color(30, 144, 255));
+		lblSongName.setAlignmentY(0.0f);
+		lblSongName.setAutoscrolls(true);
+		lblSongName.setFont(new Font("Tahoma", Font.ITALIC, 14));
 		setForeground(UIManager.getColor("InternalFrame.activeTitleGradient"));
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 428, 321);
 		pack();
-		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
