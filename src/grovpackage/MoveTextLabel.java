@@ -5,6 +5,10 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.Timer;
@@ -13,7 +17,7 @@ import javax.swing.Timer;
  * 
  * @author Elf Label with moving text
  */
-public class MoveTextLabel extends JLabel {
+public class MoveTextLabel extends JLabel implements Observer {
 	private static final long serialVersionUID = 1L;
 	private static final int COUNT_CHAR_IN_LABEL = 90;
 	private final int MOVE_SPEED = 500; // milliseconds
@@ -80,5 +84,30 @@ public class MoveTextLabel extends JLabel {
 
 	public void stop() {
 		moveTextTimer.stop();
+	}
+
+	@Override
+	public void update(Observable o, Object source) {
+		GroooovPlayer player = null;
+		if (!(source instanceof GroooovPlayer)) {
+			Logger.getGlobal().log(Level.SEVERE,
+					"MoveTextLabel bad notify from player");
+			return;
+		}
+		player = (GroooovPlayer) source;
+
+		switch (player.getPlayerState()) {
+		case STOP:
+			initText("Welcome to the Grooooov!!!!");
+			moveTextTimer.stop();
+			break;
+		case PAUSE:
+			moveTextTimer.stop();
+			break;
+		case PLAY:
+			initText(player.getCurrentSong().getFilename());
+			moveTextTimer.start();
+			break;
+		}
 	}
 }

@@ -28,11 +28,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.UIManager;
+import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.border.BevelBorder;
 
 class wndMainGroov extends JFrame {
 
@@ -144,14 +142,6 @@ class wndMainGroov extends JFrame {
 		btnPlay.setHorizontalAlignment(SwingConstants.LEFT);
 		btnPlay.setVerticalAlignment(SwingConstants.TOP);
 		pnlPlay.add(btnPlay, gbc_btnPlay);
-		btnPlay.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				lblSongName.initText(lstListOfSongs.getSelectedValue().getFilename());
-				lblSongName.start();
-			}
-		});
 			
 		JButton btnPause = new JButton(pauseAction);
 		btnPause.setText("");
@@ -401,6 +391,7 @@ class wndMainGroov extends JFrame {
 		pnlSongName.setBorder(new EtchedBorder(EtchedBorder.LOWERED, new Color(0, 255, 0), new Color(0, 255, 127)));
 		getContentPane().add(pnlSongName, BorderLayout.SOUTH);
 		
+		
 		lblSongName = new MoveTextLabel("Welcome to the Grooooooooov!!!");
 		lblSongName.setMinimumSize(new Dimension(188, 20));
 		lblSongName.setMaximumSize(new Dimension(188, 20));
@@ -411,6 +402,10 @@ class wndMainGroov extends JFrame {
 		lblSongName.setAlignmentY(0.0f);
 		lblSongName.setAutoscrolls(true);
 		lblSongName.setFont(new Font("Tahoma", Font.ITALIC, 14));
+		//Add Song Name label to sound player observers
+		PlayerGUIManager manager = PlayerGUIManager.getInstance();
+		manager.addObserver(lblSongName);
+		soundPlayer.setManagerGUI(manager);
 		setForeground(UIManager.getColor("InternalFrame.activeTitleGradient"));
 		setBounds(100, 100, 428, 321);
 		pack();

@@ -2,18 +2,24 @@ package grovpackage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Observer;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+
+import javazoom.jlgui.basicplayer.BasicPlayer;
+import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
 
-import javazoom.jlgui.basicplayer.BasicPlayer;
-import javazoom.jlgui.basicplayer.BasicPlayerException;
-
 public class GroooovPlayer extends BasicPlayer {
+
+	// player states
+	public enum playerStateType {
+			PAUSE, PLAY, STOP
+		};
 
 	// Thread in witch duration of song will change
 	// private Thread durationThred;
@@ -21,6 +27,7 @@ public class GroooovPlayer extends BasicPlayer {
 	public static final int SATRT_VOLUME = MAX_VOLUME / 2;
 	public static final int SEEK_STEP = 300000;
 	private playerStateType playerState = playerStateType.STOP;
+
 	private double currentVolume;
 	// PlayList
 	private PlayList lstSongsList = null;
@@ -29,26 +36,32 @@ public class GroooovPlayer extends BasicPlayer {
 	// No playing song
 	int playSongIndex = -1;
 
-	// player states
-	private enum playerStateType {
-		PAUSE, PLAY, STOP
-	};
+	// Manager between player and GUI elements
+	Observer managerGUI;
 
+	
 	public GroooovPlayer(PlayList lstSongsList) {
 		super();
 		this.lstSongsList = lstSongsList;
-		playerState = playerStateType.STOP;
+	}
+
+	public void setManagerGUI(Observer managerGUI) {
+		this.managerGUI = managerGUI;
+	}
+
+	public playerStateType getPlayerState() {
+		return playerState;
 	}
 
 	@Override
 	public void pause() throws BasicPlayerException {
-		playerState = playerStateType.PAUSE;
+		changeState(playerStateType.PAUSE);
 		super.pause();
 	}
 
 	@Override
 	public void resume() throws BasicPlayerException {
-		playerState = playerStateType.PLAY;
+		changeState(playerStateType.PLAY);
 		super.resume();
 	}
 
@@ -79,8 +92,9 @@ public class GroooovPlayer extends BasicPlayer {
 				playSongIndex = songIndex;
 				setCurrentSong(new Mp3File(songFile));
 			}
-			playerState = playerStateType.PLAY;
-		} catch (BasicPlayerException | UnsupportedTagException | InvalidDataException | IOException e) {
+			changeState(playerStateType.PLAY);
+		} catch (BasicPlayerException | UnsupportedTagException
+				| InvalidDataException | IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -89,8 +103,13 @@ public class GroooovPlayer extends BasicPlayer {
 		return currentSong;
 	}
 
-	public void setCurrentSong( Mp3File mp3File) {
-        currentSong = mp3File;
+	public void setCurrentSong(Mp3File mp3File) {
+		currentSong = mp3File;
+	}
+
+	private void changeState(playerStateType newState) {
+		playerState = newState;
+		managerGUI.update(null, this);
 	}
 
 	public void play(File songFile) {
@@ -103,7 +122,7 @@ public class GroooovPlayer extends BasicPlayer {
 				super.play();
 			}
 			playSongIndex = lstSongsList.getSelectedIndex();
-			playerState = playerStateType.PLAY;
+			changeState(playerStateType.PLAY);
 		} catch (BasicPlayerException e) {
 			e.printStackTrace();
 		}
@@ -119,7 +138,7 @@ public class GroooovPlayer extends BasicPlayer {
 				super.play();
 			}
 			playSongIndex = lstSongsList.getSelectedIndex();
-			playerState = playerStateType.PLAY;
+			changeState(playerStateType.PLAY);
 			currentSong = mp3SongFile;
 		} catch (BasicPlayerException e) {
 			e.printStackTrace();
@@ -205,6 +224,7 @@ public class GroooovPlayer extends BasicPlayer {
 	@Override
 	public void stop() throws BasicPlayerException {
 		super.stop();
+		changeState(playerStateType.STOP);
 		playSongIndex = -1;
 	}
 }
