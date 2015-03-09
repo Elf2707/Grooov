@@ -1,7 +1,8 @@
 package grovpackage;
 
+import grooveinterfaces.PlayerStates;
+
 import java.io.File;
-import java.io.IOException;
 import java.util.Observer;
 
 import javax.swing.DefaultListModel;
@@ -9,140 +10,161 @@ import javax.swing.JOptionPane;
 
 import javazoom.jlgui.basicplayer.BasicPlayer;
 import javazoom.jlgui.basicplayer.BasicPlayerException;
+import playerstates.PauseState;
+import playerstates.PlayState;
+import playerstates.StopState;
 
-import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
-import com.mpatric.mp3agic.UnsupportedTagException;
 
 public class GroooovPlayer extends BasicPlayer {
 
-	// player states
-	public enum playerStateType {
-			PAUSE, PLAY, STOP
-		};
+	private PlayerStates playState = new PlayState(this);
+	private PlayerStates pauseState = new PauseState(this);
+	private PlayerStates stopState = new StopState(this);
 
 	// Thread in witch duration of song will change
 	// private Thread durationThred;
 	public static final int MAX_VOLUME = 100;
 	public static final int SATRT_VOLUME = MAX_VOLUME / 2;
 	public static final int SEEK_STEP = 300000;
-	private playerStateType playerState = playerStateType.STOP;
+	private PlayerStates playerState = stopState;
 
 	private double currentVolume;
 	// PlayList
 	private PlayList lstSongsList = null;
-	Mp3File currentSong;
-
-	// No playing song
-	int playSongIndex = -1;
+	private Mp3File currentSong;
 
 	// Manager between player and GUI elements
-	Observer managerGUI;
+	private Observer managerGUI;
 
-	
+	// No playing song
+	private int playSongIndex = -1;
+
+	// Command to observers depends of state changing
+	private String commandToObservers;
+
 	public GroooovPlayer(PlayList lstSongsList) {
 		super();
 		this.lstSongsList = lstSongsList;
+	}
+
+	public PlayerStates getPlayState() {
+		return playState;
+	}
+
+	public void setPlayState(PlayerStates playState) {
+		this.playState = playState;
+	}
+
+	public PlayerStates getPauseState() {
+		return pauseState;
+	}
+
+	public void setPauseState(PlayerStates pauseState) {
+		this.pauseState = pauseState;
+	}
+
+	public PlayerStates getStopState() {
+		return stopState;
+	}
+
+	public void setStopState(PlayerStates stopState) {
+		this.stopState = stopState;
+	}
+
+	public int getPlaySongIndex() {
+		return playSongIndex;
+	}
+
+	public void setPlaySongIndex(int playSongIndex) {
+		this.playSongIndex = playSongIndex;
 	}
 
 	public void setManagerGUI(Observer managerGUI) {
 		this.managerGUI = managerGUI;
 	}
 
-	public playerStateType getPlayerState() {
+	public Observer getManagerGUI() {
+		return managerGUI;
+	}
+
+	public PlayerStates getPlayerState() {
 		return playerState;
 	}
 
-	@Override
-	public void pause() throws BasicPlayerException {
-		changeState(playerStateType.PAUSE);
-		super.pause();
+	public void setPlayerState(PlayerStates newState) {
+		playerState = newState;
 	}
 
-	@Override
-	public void resume() throws BasicPlayerException {
-		changeState(playerStateType.PLAY);
-		super.resume();
+	public String getCommandToObservers() {
+		return commandToObservers;
 	}
 
-	@Override
-	public void play() {
+	public void setCommandToObservers(String commandToObservers) {
+		this.commandToObservers = commandToObservers;
+		//Command change notifying observers
+		managerGUI.update(null, this);
+	}
+
+	public void pauseSong() throws BasicPlayerException {
+		playerState.pause();
+	}
+
+	public void resumeSong() {
+		playerState.resume();
+	}
+
+	public void openFile(String songName) {
+		// Empty PlayList?
+		int songsCount = lstSongsList.getModel().getSize();
+		if (songsCount == 0) {
+			JOptionPane.showMessageDialog(lstSongsList, "No songs in List!!!");
+			return;
+		}
+		int songIndex = lstSongsList.getSelectedIndex();
+		if (songIndex == -1) {
+			// PlayList not empty, but no songs selected
+			songIndex = 0;
+			lstSongsList.setSelectedIndex(0);
+		}
+		File songFile = new File(lstSongsList.getModel()
+				.getElementAt(songIndex).getFilename());
 		try {
-			// if it resume do resume else get song and play it
-			if (playerState == playerStateType.PAUSE) {
-				resume();
-			} else {
-				// Empty PlayList?
-				int songIndex = lstSongsList.getSelectedIndex();
-				int songsCount = lstSongsList.getModel().getSize();
-				if (songsCount == 0) {
-					JOptionPane.showMessageDialog(lstSongsList,
-							"No songs in List!!!");
-					return;
-				}
-				if (songIndex == -1) {
-					// PlayList not empty, but no songs selected
-					songIndex = 0;
-				}
-				File songFile = new File(lstSongsList.getModel()
-						.getElementAt(songIndex).getFilename());
-				super.stop();
-				super.open(songFile);
-				super.play();
-				playSongIndex = songIndex;
-				setCurrentSong(new Mp3File(songFile));
-			}
-			changeState(playerStateType.PLAY);
-		} catch (BasicPlayerException | UnsupportedTagException
-				| InvalidDataException | IOException e) {
+			open(songFile);
+			playSongIndex = songIndex;
+		} catch (BasicPlayerException e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	public void openFile(Mp3File mp3Song) {
+		openFile(mp3Song.getFilename());
+	}
+
+	public void playSong() {
+		playerState.play();
 	}
 
 	public Mp3File getCurrentSong() {
 		return currentSong;
 	}
 
-	public void setCurrentSong(Mp3File mp3File) {
-		currentSong = mp3File;
+	/**
+	 * Set all data about current song take data from list of songs
+	 */
+	public void setCurrentSong() {
+		playSongIndex = lstSongsList.getSelectedIndex();
+		currentSong = (((DefaultListModel<Mp3File>) lstSongsList.getModel())
+				.getElementAt(playSongIndex));
 	}
 
-	private void changeState(playerStateType newState) {
-		playerState = newState;
-		managerGUI.update(null, this);
+	public void playSong(File songFile) {
+		playerState.play(songFile.getAbsolutePath());
 	}
 
-	public void play(File songFile) {
-		try {
-			if (playerState == playerStateType.PAUSE) {
-				resume();
-			} else {
-				super.stop();
-				open(songFile);
-				super.play();
-			}
-			playSongIndex = lstSongsList.getSelectedIndex();
-			changeState(playerStateType.PLAY);
-		} catch (BasicPlayerException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void play(Mp3File mp3SongFile) {
-		try {
-			if (playerState == playerStateType.PAUSE) {
-				resume();
-			} else {
-				super.stop();
-				open(new File(mp3SongFile.getFilename()));
-				super.play();
-			}
-			playSongIndex = lstSongsList.getSelectedIndex();
-			changeState(playerStateType.PLAY);
-			currentSong = mp3SongFile;
-		} catch (BasicPlayerException e) {
-			e.printStackTrace();
-		}
+	public void playSong(Mp3File mp3SongFile) {
+		playerState.play(mp3SongFile);
 	}
 
 	/**
@@ -160,7 +182,7 @@ public class GroooovPlayer extends BasicPlayer {
 			playSongIndex++;
 		}
 		lstSongsList.setSelectedIndex(playSongIndex);
-		play(((DefaultListModel<Mp3File>) lstSongsList.getModel())
+		playSong(((DefaultListModel<Mp3File>) lstSongsList.getModel())
 				.getElementAt(playSongIndex));
 	}
 
@@ -179,7 +201,7 @@ public class GroooovPlayer extends BasicPlayer {
 			playSongIndex--;
 		}
 		lstSongsList.setSelectedIndex(playSongIndex);
-		play(((DefaultListModel<Mp3File>) lstSongsList.getModel())
+		playSong(((DefaultListModel<Mp3File>) lstSongsList.getModel())
 				.getElementAt(playSongIndex));
 	}
 
@@ -199,10 +221,10 @@ public class GroooovPlayer extends BasicPlayer {
 	}
 
 	/**
-	 * Is player now plaing song
+	 * Is player now playing song
 	 */
 	public boolean isPlaing() {
-		return playerState == playerStateType.PLAY;
+		return playerState instanceof PlayState;
 	}
 
 	public void mute(boolean onMute) {
@@ -221,10 +243,8 @@ public class GroooovPlayer extends BasicPlayer {
 		return super.seek(SEEK_STEP);
 	}
 
-	@Override
-	public void stop() throws BasicPlayerException {
-		super.stop();
-		changeState(playerStateType.STOP);
-		playSongIndex = -1;
+	public void stopSong() throws BasicPlayerException {
+		playerState.stop();
 	}
+
 }

@@ -34,25 +34,19 @@ public class PlayerButtonsAction extends AbstractAction {
 	public void actionPerformed(ActionEvent e) {
 		String command = getValue(Action.NAME).toString();
 		if(command.equalsIgnoreCase("PLAY")){
-		    player.play();
+		    player.playSong();
 		    return;
 		}
 		
 		if(command.equalsIgnoreCase("RESUME")){
-			try {
-				player.resume();
-			} catch (BasicPlayerException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			player.resumeSong();
 			return;
 		}
 		
 		if( command.equalsIgnoreCase("PAUSE") ){
 			try {
-				player.pause();
+				player.pauseSong();
 			} catch (BasicPlayerException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			return;
@@ -60,9 +54,8 @@ public class PlayerButtonsAction extends AbstractAction {
 		
 		if( command.equalsIgnoreCase("STOP") ){
 			try {
-				player.stop();
+				player.stopSong();
 			} catch (BasicPlayerException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			return;
@@ -72,7 +65,6 @@ public class PlayerButtonsAction extends AbstractAction {
 			try {
 				player.setGain(0);
 			} catch (BasicPlayerException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			return;
@@ -82,7 +74,6 @@ public class PlayerButtonsAction extends AbstractAction {
 			try {
 				player.seek(0);
 			} catch (BasicPlayerException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			return;
@@ -92,7 +83,6 @@ public class PlayerButtonsAction extends AbstractAction {
 			try {
 				player.seek(0);
 			} catch (BasicPlayerException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}

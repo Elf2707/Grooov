@@ -88,24 +88,27 @@ public class MoveTextLabel extends JLabel implements Observer {
 
 	@Override
 	public void update(Observable o, Object source) {
-		GroooovPlayer player = null;
 		if (!(source instanceof GroooovPlayer)) {
 			Logger.getGlobal().log(Level.SEVERE,
-					"MoveTextLabel bad notify from player");
+					"Error while managing player with GUI elements");
 			return;
 		}
-		player = (GroooovPlayer) source;
+		GroooovPlayer player = (GroooovPlayer) source;
+		String command = player.getCommandToObservers();
 
-		switch (player.getPlayerState()) {
-		case STOP:
+		switch (command.toLowerCase()) {
+		case "stop":
 			initText("Welcome to the Grooooov!!!!");
 			moveTextTimer.stop();
 			break;
-		case PAUSE:
+		case "pause":
 			moveTextTimer.stop();
 			break;
-		case PLAY:
+		case "play":
 			initText(player.getCurrentSong().getFilename());
+			moveTextTimer.start();
+			break;
+		case "resume":
 			moveTextTimer.start();
 			break;
 		}
