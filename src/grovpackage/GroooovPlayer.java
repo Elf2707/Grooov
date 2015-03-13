@@ -2,11 +2,17 @@ package grovpackage;
 
 import grooveinterfaces.PlayerStates;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
 import javazoom.jlgui.basicplayer.BasicPlayer;
 import javazoom.jlgui.basicplayer.BasicPlayerException;
@@ -16,7 +22,7 @@ import playerstates.StopState;
 
 import com.mpatric.mp3agic.Mp3File;
 
-public class GroooovPlayer extends BasicPlayer {
+public class GroooovPlayer extends BasicPlayer implements Observer {
 
 	private PlayerStates playState = new PlayState(this);
 	private PlayerStates pauseState = new PauseState(this);
@@ -42,10 +48,31 @@ public class GroooovPlayer extends BasicPlayer {
 
 	// Command to observers depends of state changing
 	private String commandToObservers;
+	private final int DURATION_TIMER_TIC = 1000; // ms
+	// Song duration timer
+	Timer durationTimer;
+	// Song duration in ms
+	long songDuration = 0;
 
 	public GroooovPlayer(PlayList lstSongsList) {
 		super();
 		this.lstSongsList = lstSongsList;
+		durationTimer = new Timer(DURATION_TIMER_TIC, new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				songDuration -= DURATION_TIMER_TIC;
+				if (songDuration <= 0) {
+					try {
+						playerState.stop();
+						playNext();
+					} catch (BasicPlayerException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
 	}
 
 	public PlayerStates getPlayState() {
@@ -102,7 +129,7 @@ public class GroooovPlayer extends BasicPlayer {
 
 	public void setCommandToObservers(String commandToObservers) {
 		this.commandToObservers = commandToObservers;
-		//Command change notifying observers
+		// Command change notifying observers
 		managerGUI.update(null, this);
 	}
 
@@ -157,6 +184,8 @@ public class GroooovPlayer extends BasicPlayer {
 		playSongIndex = lstSongsList.getSelectedIndex();
 		currentSong = (((DefaultListModel<Mp3File>) lstSongsList.getModel())
 				.getElementAt(playSongIndex));
+		songDuration = (((DefaultListModel<Mp3File>) lstSongsList.getModel())
+				.getElementAt(playSongIndex)).getLengthInMilliseconds();
 	}
 
 	public void playSong(File songFile) {
@@ -175,6 +204,13 @@ public class GroooovPlayer extends BasicPlayer {
 			JOptionPane.showMessageDialog(null, "Where is no playing songs!!!");
 			return;
 		}
+
+		try {
+			stopSong();
+		} catch (BasicPlayerException e) {
+			e.printStackTrace();
+		}
+
 		if (playSongIndex == ((DefaultListModel<Mp3File>) lstSongsList
 				.getModel()).size() - 1) {
 			playSongIndex = 0;
@@ -194,6 +230,13 @@ public class GroooovPlayer extends BasicPlayer {
 			JOptionPane.showMessageDialog(null, "Where is no playing songs!!!");
 			return;
 		}
+
+		try {
+			stopSong();
+		} catch (BasicPlayerException e) {
+			e.printStackTrace();
+		}
+
 		if (playSongIndex == 0) {
 			playSongIndex = ((DefaultListModel<Mp3File>) lstSongsList
 					.getModel()).size() - 1;
@@ -245,6 +288,40 @@ public class GroooovPlayer extends BasicPlayer {
 
 	public void stopSong() throws BasicPlayerException {
 		playerState.stop();
+	}
+
+	public void startDuarationCalc() {
+		durationTimer.start();
+	}
+
+	public void stopDuarationCalc() {
+		durationTimer.stop();
+	}
+
+	@Override
+	public void update(Observable o, Object source) {
+		if (!(source instanceof GroooovPlayer)) {
+			Logger.getGlobal().log(Level.SEVERE,
+					"Error in player managin song duration");
+			return;
+		}
+		GroooovPlayer player = (GroooovPlayer) source;
+		String command = player.getCommandToObservers();
+
+		switch (command.toLowerCase()) {
+		case "stop":
+			durationTimer.stop();
+			break;
+		case "pause":
+			durationTimer.stop();
+			break;
+		case "start":
+			durationTimer.start();
+			break;
+		case "resume":
+			durationTimer.start();
+			break;
+		}
 	}
 
 }

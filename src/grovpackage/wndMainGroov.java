@@ -19,7 +19,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -247,7 +246,7 @@ class wndMainGroov extends JFrame {
 		});
 		
 			
-		JSlider sldrSongFlow = new JSlider();
+		MovingSlider sldrSongFlow = new MovingSlider();
 		GridBagConstraints gbc_sldrSongFlow = new GridBagConstraints();
 		gbc_sldrSongFlow.gridwidth = 6;
 		gbc_sldrSongFlow.fill = GridBagConstraints.HORIZONTAL;
@@ -257,7 +256,7 @@ class wndMainGroov extends JFrame {
 		sldrSongFlow.setValue(0);
 		pnlList.add(sldrSongFlow, gbc_sldrSongFlow);
 		
-		JLabel lblSongTime = new JLabel("00:00:00");
+		TimeTicLabel lblSongTime = new TimeTicLabel(0);
 		GridBagConstraints gbc_lblSongTime = new GridBagConstraints();
 		gbc_lblSongTime.insets = new Insets(0, 0, 5, 5);
 		gbc_lblSongTime.gridx = 6;
@@ -402,9 +401,12 @@ class wndMainGroov extends JFrame {
 		lblSongName.setAlignmentY(0.0f);
 		lblSongName.setAutoscrolls(true);
 		lblSongName.setFont(new Font("Tahoma", Font.ITALIC, 14));
-		//Add Song Name label to sound player observers
+		//Add observers to sound player for managing GUI and song duration
 		PlayerGUIManager manager = PlayerGUIManager.getInstance();
 		manager.addObserver(lblSongName);
+		manager.addObserver(lblSongTime);
+		manager.addObserver(sldrSongFlow);
+		manager.addObserver(soundPlayer);
 		soundPlayer.setManagerGUI(manager);
 		setForeground(UIManager.getColor("InternalFrame.activeTitleGradient"));
 		setBounds(100, 100, 428, 321);

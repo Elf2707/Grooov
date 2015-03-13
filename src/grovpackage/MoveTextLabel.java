@@ -21,13 +21,15 @@ public class MoveTextLabel extends JLabel implements Observer {
 	private static final long serialVersionUID = 1L;
 	private static final int COUNT_CHAR_IN_LABEL = 90;
 	private final int MOVE_SPEED = 500; // milliseconds
-	Timer moveTextTimer;
-	int countOfCharsInLabel = -1;
-	int outStringPosition = 0;
-	String movingText;
+	private Timer moveTextTimer;
+	@SuppressWarnings("unused")
+	private int countOfCharsInLabel = -1;
+	private int outStringPosition = 0;
+	private String movingText;
 
 	/**
-	 * @param speed
+	 * 
+	 * @param movingText - label text
 	 */
 	public MoveTextLabel(String movingText) {
 		setBounds(new Rectangle(450, 14));
@@ -104,7 +106,7 @@ public class MoveTextLabel extends JLabel implements Observer {
 		case "pause":
 			moveTextTimer.stop();
 			break;
-		case "play":
+		case "start":
 			initText(player.getCurrentSong().getFilename());
 			moveTextTimer.start();
 			break;

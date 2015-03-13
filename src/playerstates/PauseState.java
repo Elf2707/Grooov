@@ -16,7 +16,7 @@ public class PauseState implements PlayerStates {
 	@Override
 	public void play() {
 		try {
-			soundPlayer.play();
+			soundPlayer.resume();
 			soundPlayer.setPlayerState(soundPlayer.getPlayState());
 			soundPlayer.setCommandToObservers("resume");
 		} catch (BasicPlayerException e) {
