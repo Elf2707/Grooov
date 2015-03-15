@@ -181,7 +181,19 @@ public class GroooovPlayer extends BasicPlayer implements Observer {
 	 * Set all data about current song take data from list of songs
 	 */
 	public void setCurrentSong() {
+		if((((DefaultListModel<Mp3File>) lstSongsList.getModel()).isEmpty())){
+			JOptionPane.showMessageDialog(null, "Where is no songs to play!!!");
+			playSongIndex = -1;
+			currentSong = null;
+			songDuration = 0;
+			return;
+		}
 		playSongIndex = lstSongsList.getSelectedIndex();
+		if (playSongIndex == -1) {
+		    //Sets first song in list
+			lstSongsList.setSelectedIndex(0);
+			playSongIndex = 0;
+		}
 		currentSong = (((DefaultListModel<Mp3File>) lstSongsList.getModel())
 				.getElementAt(playSongIndex));
 		songDuration = (((DefaultListModel<Mp3File>) lstSongsList.getModel())

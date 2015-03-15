@@ -17,9 +17,11 @@ import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
@@ -37,7 +39,7 @@ class wndMainGroov extends JFrame {
 	private int lastVolumePosition = GroooovPlayer.SATRT_VOLUME;
 	private GroooovPlayer soundPlayer = null;
     Timer playTimer = null;
-    MoveTextLabel lblSongName;
+    JFrame mainFrame;    
     
 	
 
@@ -46,6 +48,7 @@ class wndMainGroov extends JFrame {
 	 */
 	public wndMainGroov() {
 		initialize();
+		mainFrame = this;
 	}
 
 	/**
@@ -130,6 +133,13 @@ class wndMainGroov extends JFrame {
 		amap.put("soundPlayer.rewind", rewindAction);
 		amap.put("soundPlayer.playNext", nextAction);
 		amap.put("soundPlayer.playPrev", previousAction);
+		
+		JPopupMenu contextMenu = new JPopupMenu();
+		contextMenu.add(playAction);
+		contextMenu.add(pauseAction);
+		contextMenu.add(stopAction);
+		
+		lstListOfSongs.setComponentPopupMenu(contextMenu);
 		
 		JButton btnPlay = new JButton(playAction);
 		btnPlay.setText("");
@@ -391,7 +401,7 @@ class wndMainGroov extends JFrame {
 		getContentPane().add(pnlSongName, BorderLayout.SOUTH);
 		
 		
-		lblSongName = new MoveTextLabel("Welcome to the Grooooooooov!!!");
+		MoveTextLabel lblSongName = new MoveTextLabel("Welcome to the Grooooooooov!!!");
 		lblSongName.setMinimumSize(new Dimension(188, 20));
 		lblSongName.setMaximumSize(new Dimension(188, 20));
 		lblSongName.setBounds(new Rectangle(0, 0, 450, 20));
@@ -406,11 +416,27 @@ class wndMainGroov extends JFrame {
 		manager.addObserver(lblSongName);
 		manager.addObserver(lblSongTime);
 		manager.addObserver(sldrSongFlow);
+		
+		JButton btnSkin = new JButton("Skin");
+		btnSkin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JDialog changeLook = new SkinChangeDialog(mainFrame);
+				changeLook.setLocationRelativeTo(mainFrame);
+				changeLook.setVisible(true);
+			}
+		});
+		
+		GridBagConstraints gbc_btnSkin = new GridBagConstraints();
+		gbc_btnSkin.insets = new Insets(0, 0, 0, 5);
+		gbc_btnSkin.gridx = 6;
+		gbc_btnSkin.gridy = 3;
+		pnlList.add(btnSkin, gbc_btnSkin);
 		manager.addObserver(soundPlayer);
 		soundPlayer.setManagerGUI(manager);
 		setForeground(UIManager.getColor("InternalFrame.activeTitleGradient"));
 		setBounds(100, 100, 428, 321);
 		pack();
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	

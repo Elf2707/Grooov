@@ -1,10 +1,10 @@
 package playerstates;
 
-import com.mpatric.mp3agic.Mp3File;
-
 import grooveinterfaces.PlayerStates;
 import grovpackage.GroooovPlayer;
 import javazoom.jlgui.basicplayer.BasicPlayerException;
+
+import com.mpatric.mp3agic.Mp3File;
 
 /**
  * Play state of player
@@ -22,6 +22,9 @@ public class PlayState implements PlayerStates {
 	@Override
 	public void play() {
 		soundPlayer.setCurrentSong();
+		if(soundPlayer.getPlaySongIndex() == -1){
+			return;
+		}
 		play(soundPlayer.getCurrentSong().getFilename());
 	}
 
