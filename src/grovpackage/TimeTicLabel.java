@@ -74,6 +74,11 @@ public class TimeTicLabel extends JLabel implements Observer {
 		case "resume":
 			changeTimer.start();
 			break;
+		case "seek":
+			long position = player.getCurrentSong().getLengthInMilliseconds()
+					- player.getCurrPosMs();
+			initText(position);
+			break;
 		}
 	}
 }

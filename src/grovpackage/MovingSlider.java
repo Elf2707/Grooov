@@ -15,7 +15,7 @@ public class MovingSlider extends JSlider implements Observer {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private long songDuration;
+	private long songPositionMs;
 	private Timer moveTimer;
 	private final int MOVE_SPEED = 1000; // milliseconds
 
@@ -23,15 +23,15 @@ public class MovingSlider extends JSlider implements Observer {
 		moveTimer = new Timer(MOVE_SPEED, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				songDuration -= MOVE_SPEED / 1000; // in seconds
-				setValue(getMaximum() - (int) songDuration);
+				songPositionMs -= MOVE_SPEED;
+				setValue(getMaximum() - (int) songPositionMs);
 			}
 		});
 	}
 
-	public void init(long songDuaration) {
-		this.songDuration = songDuaration;
-		setMaximum((int) songDuaration);
+	public void init(long songDuarationMs) {
+		this.songPositionMs = songDuarationMs;
+		setMaximum((int) songDuarationMs);
 		setMinimum(0);
 		setValue(0);
 	}
@@ -63,11 +63,15 @@ public class MovingSlider extends JSlider implements Observer {
 			moveTimer.stop();
 			break;
 		case "start":
-			init(player.getCurrentSong().getLengthInSeconds());
+			init(player.getCurrentSong().getLengthInMilliseconds());
 			moveTimer.start();
 			break;
 		case "resume":
 			moveTimer.start();
+			break;
+		case "seek":
+			setValue((int) player.getCurrPosMs());
+			songPositionMs = getMaximum() - getValue();
 			break;
 		}
 	}

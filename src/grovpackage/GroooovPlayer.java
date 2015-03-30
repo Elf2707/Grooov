@@ -50,9 +50,11 @@ public class GroooovPlayer extends BasicPlayer implements Observer {
 	private String commandToObservers;
 	private final int DURATION_TIMER_TIC = 1000; // ms
 	// Song duration timer
-	Timer durationTimer;
+	private Timer durationTimer;
 	// Song duration in ms
-	long songDuration = 0;
+	private long songDuration = 0;
+	// Current position in song in ms for seek method
+	private long currPosMs = 0;
 
 	public GroooovPlayer(PlayList lstSongsList) {
 		super();
@@ -67,7 +69,6 @@ public class GroooovPlayer extends BasicPlayer implements Observer {
 						playerState.stop();
 						playNext();
 					} catch (BasicPlayerException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -181,7 +182,7 @@ public class GroooovPlayer extends BasicPlayer implements Observer {
 	 * Set all data about current song take data from list of songs
 	 */
 	public void setCurrentSong() {
-		if((((DefaultListModel<Mp3File>) lstSongsList.getModel()).isEmpty())){
+		if ((((DefaultListModel<Mp3File>) lstSongsList.getModel()).isEmpty())) {
 			JOptionPane.showMessageDialog(null, "Where is no songs to play!!!");
 			playSongIndex = -1;
 			currentSong = null;
@@ -190,14 +191,13 @@ public class GroooovPlayer extends BasicPlayer implements Observer {
 		}
 		playSongIndex = lstSongsList.getSelectedIndex();
 		if (playSongIndex == -1) {
-		    //Sets first song in list
+			// Sets first song in list
 			lstSongsList.setSelectedIndex(0);
 			playSongIndex = 0;
 		}
 		currentSong = (((DefaultListModel<Mp3File>) lstSongsList.getModel())
 				.getElementAt(playSongIndex));
-		songDuration = (((DefaultListModel<Mp3File>) lstSongsList.getModel())
-				.getElementAt(playSongIndex)).getLengthInMilliseconds();
+		songDuration = currentSong.getLengthInMilliseconds();
 	}
 
 	public void playSong(File songFile) {
@@ -278,8 +278,8 @@ public class GroooovPlayer extends BasicPlayer implements Observer {
 	/**
 	 * Is player now playing song
 	 */
-	public boolean isPlaing() {
-		return playerState instanceof PlayState;
+	public boolean isPlaying() {
+		return (playerState instanceof PlayState) || (playerState instanceof PauseState);
 	}
 
 	public void mute(boolean onMute) {
@@ -290,12 +290,16 @@ public class GroooovPlayer extends BasicPlayer implements Observer {
 		}
 	}
 
-	@Override
-	public long seek(long arg0) throws BasicPlayerException {
-		// long skipBytes = (long) Math.round(((Integer)
-		// audioInfo.get("audio.length.bytes")).intValue() * rate);
-		// seek(skipBytes);
-		return super.seek(SEEK_STEP);
+	public void seekSong(long seekPosMs) throws BasicPlayerException {
+		int rate = currentSong.getBitrate() / 8; //kbytes per sec
+		long realSeek = super.seek((seekPosMs) * rate ); // (millisec/1000)*kbyte
+		currPosMs = realSeek / rate;
+		commandToObservers = "seek";
+		managerGUI.update(null, this);
+	}
+
+	public long getCurrPosMs() {
+		return currPosMs;
 	}
 
 	public void stopSong() throws BasicPlayerException {
@@ -332,6 +336,9 @@ public class GroooovPlayer extends BasicPlayer implements Observer {
 			break;
 		case "resume":
 			durationTimer.start();
+			break;
+		case "seek":
+			songDuration = currentSong.getLengthInMilliseconds() - currPosMs;
 			break;
 		}
 	}

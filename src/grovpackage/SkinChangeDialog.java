@@ -2,6 +2,7 @@ package grovpackage;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -42,7 +43,9 @@ public class SkinChangeDialog extends JDialog {
 	public SkinChangeDialog(JFrame pearent) {
 		super(pearent, "Change Grooooove Skins Window", true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
+		Point location = pearent.getLocationOnScreen();
+		location.translate(0, pearent.getHeight());
+		setLocation(location);
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -51,26 +54,32 @@ public class SkinChangeDialog extends JDialog {
 
 		JRadioButton rdbtnWindowsLook = new JRadioButton("WindowsLook");
 		rdbtnWindowsLook.setActionCommand("windowslook");
+
 		JRadioButton rdbtnMetalLook = new JRadioButton("MetalLook");
 		rdbtnMetalLook.setActionCommand("metallook");
+
 		JRadioButton rdbtnNimbusLook = new JRadioButton("NibusLook");
 		rdbtnNimbusLook.setActionCommand("nimbus");
+
 		JRadioButton rdbtnMotifLook = new JRadioButton("MotifLook");
 		rdbtnMotifLook.setActionCommand("motiflook");
 		JRadioButton rdbtnWindowsclassicLook = new JRadioButton(
 				"WindowsClassicLook");
 		rdbtnWindowsclassicLook.setActionCommand("windowsclassicklook");
+
 		chooseLookButtonGroup.add(rdbtnWindowsLook);
 		chooseLookButtonGroup.add(rdbtnMetalLook);
 		chooseLookButtonGroup.add(rdbtnNimbusLook);
-		chooseLookButtonGroup.add(rdbtnWindowsclassicLook);
 		chooseLookButtonGroup.add(rdbtnMotifLook);
+		chooseLookButtonGroup.add(rdbtnWindowsclassicLook);
 
 		ActionListener buttonsCationListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				oldLookAndFeel = UIManager.getLookAndFeel();
+
 				LookAndFeel newLookAndFeel;
+
 				String command = e.getActionCommand();
 				switch (command) {
 				case "windowslook":
@@ -106,14 +115,14 @@ public class SkinChangeDialog extends JDialog {
 		rdbtnMetalLook.addActionListener(buttonsCationListener);
 		rdbtnNimbusLook.addActionListener(buttonsCationListener);
 		rdbtnWindowsclassicLook.addActionListener(buttonsCationListener);
-		rdbtnWindowsLook.addActionListener(buttonsCationListener);
+		rdbtnMotifLook.addActionListener(buttonsCationListener);
 
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 		contentPanel.add(rdbtnWindowsLook);
 		contentPanel.add(rdbtnMetalLook);
 		contentPanel.add(rdbtnNimbusLook);
-		contentPanel.add(rdbtnWindowsclassicLook);
 		contentPanel.add(rdbtnMotifLook);
+		contentPanel.add(rdbtnWindowsclassicLook);
 
 		Border titled = BorderFactory.createTitledBorder(
 				BorderFactory.createEtchedBorder(), "Choose skin");
