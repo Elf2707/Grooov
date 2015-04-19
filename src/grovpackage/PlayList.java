@@ -131,7 +131,11 @@ public class PlayList extends JList<Mp3File> implements Serializable {
 		}
 		while (addFileName != null) {
 			try {
-				mp3ListModel.addElement(new Mp3File(new File(addFileName)));
+				//Test file for exist
+				File addMp3File = new File(addFileName);
+				if( addMp3File.exists() ){
+					mp3ListModel.addElement(new Mp3File(addMp3File));
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("Error adding songs from loadin PlayList "
